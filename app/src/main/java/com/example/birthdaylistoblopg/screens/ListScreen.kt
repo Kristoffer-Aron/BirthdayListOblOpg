@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.birthdaylistoblopg.PersonUIState
 import com.example.birthdaylistoblopg.data.Person
 
 
@@ -37,6 +38,7 @@ enum class SortOrder { NAME, AGE, BIRTHDAY }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListScreen(
+    personUIState: PersonUIState,
     modifier: Modifier = Modifier,
     onNavigateToAddPage: () -> Unit = {},
     onNavigateToEditPage: () -> Unit = {}
@@ -44,94 +46,109 @@ fun ListScreen(
     var filter by remember { mutableStateOf("") }
     var sortOrder by remember { mutableStateOf(SortOrder.NAME) }
 
-    val people = remember {
-        listOf(
-            Person("John Doe", 25, "1999-05-15"),
-            Person("Jane Smith", 30, "1994-11-20"),
-            Person("Alice Johnson", 22, "2002-01-10"),
-            Person("Bob Brown", 28, "1996-08-05")
-        )
-    }
+//    val people = remember {
+//        listOf(
+//            Person("John Doe", 25, "1999-05-15"),
+//            Person("Jane Smith", 30, "1994-11-20"),
+//            Person("Alice Johnson", 22, "2002-01-10"),
+//            Person("Bob Brown", 28, "1996-08-05")
+//        )
+//    }
 
-    val filteredAndSortedPeople = people
-        .filter { it.name.contains(filter, ignoreCase = true) }
-        .sortedWith(compareBy {
-            when (sortOrder) {
-                SortOrder.NAME -> it.name
-                SortOrder.AGE -> it.age
-                SortOrder.BIRTHDAY -> it.birthday
-            }
-        })
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-                title = { Text("My Friends") })
-        }) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(5.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+
+
+        Scaffold(
+            modifier = modifier.fillMaxSize(),
+            topBar = {
+                TopAppBar(
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        titleContentColor = MaterialTheme.colorScheme.primary,
+                    ),
+                    title = { Text("My Friends") })
+            }) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(5.dp)
             ) {
-                Text(text = "Friendlist", style = MaterialTheme.typography.headlineLarge)
-                Button(onClick = { onNavigateToAddPage() }) {
-                    Text("Add")
-                }
-            }
-            OutlinedTextField(
-                value = filter,
-                onValueChange = { filter = it },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                label = { Text("Filter by name") },
-                singleLine = true,
-            )
+                if (personUIState.error != null) {
+                    Text(text = personUIState.error)
+                } else {
+                    val people = personUIState.persons
 
-            Text(text = "Sort by:", style = MaterialTheme.typography.labelLarge)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Button(onClick = { sortOrder = SortOrder.NAME }, modifier = Modifier.weight(1f)) {
-                    Text("Name")
-                }
-                Button(onClick = { sortOrder = SortOrder.AGE }, modifier = Modifier.weight(1f)) {
-                    Text("Age")
-                }
-                Button(
-                    onClick = { sortOrder = SortOrder.BIRTHDAY },
-                    modifier = Modifier.weight(1f)
+                    val filteredAndSortedPeople = people
+                        .filter { it.name.contains(filter, ignoreCase = true) }
+                        .sortedWith(compareBy {
+                            when (sortOrder) {
+                                SortOrder.NAME -> it.name
+                                SortOrder.AGE -> it.age
+                                SortOrder.BIRTHDAY -> it.birthday
+                            }
+                        })
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Text("B-day")
+                    Text(text = "Friendlist", style = MaterialTheme.typography.headlineLarge)
+                    Button(onClick = { onNavigateToAddPage() }) {
+                        Text("Add")
+                    }
                 }
-            }
+                OutlinedTextField(
+                    value = filter,
+                    onValueChange = { filter = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    label = { Text("Filter by name") },
+                    singleLine = true,
+                )
 
-            Spacer(modifier = Modifier.padding(4.dp))
+                Text(text = "Sort by:", style = MaterialTheme.typography.labelLarge)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = { sortOrder = SortOrder.NAME },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Name")
+                    }
+                    Button(
+                        onClick = { sortOrder = SortOrder.AGE },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Age")
+                    }
+                    Button(
+                        onClick = { sortOrder = SortOrder.BIRTHDAY },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("B-day")
+                    }
+                }
 
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(filteredAndSortedPeople) { person ->
-                    PersonCard(
-                        person = person,
-                        onClick = onNavigateToEditPage
-                    )
+                Spacer(modifier = Modifier.padding(4.dp))
+
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(filteredAndSortedPeople) { person ->
+                        PersonCard(
+                            person = person,
+                            onClick = onNavigateToEditPage
+                        )
+                    }
                 }
             }
         }
     }
 }
+
 
 @Composable
 fun PersonCard(
@@ -151,8 +168,3 @@ fun PersonCard(
     }
 }
 
-@Preview
-@Composable
-fun ListScreenPreview() {
-    ListScreen()
-}
