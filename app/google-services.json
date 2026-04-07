@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "997330789110",
+    "project_id": "birthdaylist-d72a4",
+    "storage_bucket": "birthdaylist-d72a4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:997330789110:android:99409ec4617d81242182d7",
+        "android_client_info": {
+          "package_name": "com.example.birthdaylistoblopg"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHydidiVP0MCNoMSctbcaV1b8iM_GDX7U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
