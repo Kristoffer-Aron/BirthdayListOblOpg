@@ -92,7 +92,7 @@ fun LoginScreen(
                             }
                         }
                 }) {
-                    Text("Sign Up")
+                    Text("Register")
                 }
 
                 Button(onClick = {
