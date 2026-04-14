@@ -71,6 +71,47 @@ class PersonRepositoryImpl(
                 NetworkResult.Error(e.message ?: "Unknown error")
             }
         }
+    }
 
+    override suspend fun deletePerson(id: Int): NetworkResult<Person> {
+        return withContext(dispatcher) {
+            try {
+                val response = personAPI.deleteBook(id)
+                if (response.isSuccessful) {
+                    val body = response.body()
+                    if (body != null)
+                        NetworkResult.Success(body)
+                    else
+                        NetworkResult.Error("Response body is null")
+                } else
+                    NetworkResult.Error(response.message())
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                NetworkResult.Error(e.message ?: "Unknown error")
+            }
+        }
+    }
+
+    override suspend fun updatePerson(id: Int, person: Person): NetworkResult<Person> {
+        return withContext(dispatcher) {
+            try {
+                val response = personAPI.updatePerson(id, person)
+                if (response.isSuccessful) {
+                    val body = response.body()
+                    if (body != null) {
+                        NetworkResult.Success(body)
+                    } else {
+                        NetworkResult.Error("Response body is null")
+                    }
+                    NetworkResult.Success(response.body()!!)
+                } else
+                    NetworkResult.Error(response.message())
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                NetworkResult.Error(e.message ?: "Unknown error")
+            }
+        }
     }
 }

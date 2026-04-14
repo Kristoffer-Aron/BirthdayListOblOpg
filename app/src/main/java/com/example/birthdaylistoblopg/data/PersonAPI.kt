@@ -19,4 +19,9 @@ interface PersonAPI {
     @POST("Persons")
     suspend fun addPerson(@Body person: Person): Response<Person>
 
+    @DELETE("Persons/{id}")
+    suspend fun deleteBook(@Path("id") id: Int): Response<Person>
+
+    @PUT("Persons/{id}")
+    suspend fun updatePerson(@Path("id") id: Int, @Body person: Person): Response<Person>
 }

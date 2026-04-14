@@ -46,10 +46,20 @@ fun ListScreen(
     modifier: Modifier = Modifier,
     onNavigateToLoginPage: () -> Unit = {},
     onNavigateToAddPage: () -> Unit = {},
-    onNavigateToEditPage: () -> Unit = {}
+    onNavigateToEditPage: (Person) -> Unit = {}
 ) {
     var filter by remember { mutableStateOf("") }
     var sortOrder by remember { mutableStateOf(SortOrder.NAME) }
+    var isAscending by remember { mutableStateOf(true) }
+
+    fun onSortClick(newOrder: SortOrder) {
+        if (sortOrder == newOrder) {
+            isAscending = !isAscending
+        } else {
+            sortOrder = newOrder
+            isAscending = true
+        }
+    }
 
     if (user == null) {
         onNavigateToLoginPage()
@@ -86,13 +96,17 @@ fun ListScreen(
 
                 val filteredAndSortedPeople = people
                     .filter { it.name.contains(filter, ignoreCase = true) }
-                    .sortedWith(compareBy {
-                        when (sortOrder) {
-                            SortOrder.NAME -> it.name
-                            SortOrder.AGE -> it.age
-                            SortOrder.BIRTHDAY -> it.birthday
+                    .let { list ->
+                        val comparator = compareBy<Person> {
+                            when (sortOrder) {
+                                SortOrder.NAME -> it.name
+                                SortOrder.AGE -> it.age
+                                SortOrder.BIRTHDAY -> it.birthday
+                            }
                         }
-                    })
+                        if (isAscending) list.sortedWith(comparator)
+                        else list.sortedWith(comparator.reversed())
+                    }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -117,22 +131,22 @@ fun ListScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Button(
-                        onClick = { sortOrder = SortOrder.NAME },
+                        onClick = { onSortClick(SortOrder.NAME) },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Name")
+                        Text("Name" + (if (sortOrder == SortOrder.NAME) (if (isAscending) " ↑" else " ↓") else ""))
                     }
                     Button(
-                        onClick = { sortOrder = SortOrder.AGE },
+                        onClick = { onSortClick(SortOrder.AGE) },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Age")
+                        Text("Age" + (if (sortOrder == SortOrder.AGE) (if (isAscending) " ↑" else " ↓") else ""))
                     }
                     Button(
-                        onClick = { sortOrder = SortOrder.BIRTHDAY },
+                        onClick = { onSortClick(SortOrder.BIRTHDAY) },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("B-day")
+                        Text("B-day" + (if (sortOrder == SortOrder.BIRTHDAY) (if (isAscending) " ↑" else " ↓") else ""))
                     }
                 }
 
@@ -145,7 +159,7 @@ fun ListScreen(
                     items(filteredAndSortedPeople) { person ->
                         PersonCard(
                             person = person,
-                            onClick = onNavigateToEditPage
+                            onClick = { onNavigateToEditPage(person) }
                         )
                     }
                 }

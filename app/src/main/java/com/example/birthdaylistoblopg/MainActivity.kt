@@ -73,7 +73,10 @@ fun MainScreen(
                 personUIState = personUIState,
                 onNavigateToLoginPage = {navController.navigate(NavRoutes.Home.route)},
                 onNavigateToAddPage = {navController.navigate(NavRoutes.Add.route)},
-                onNavigateToEditPage = {navController.navigate(NavRoutes.Edit.route)}
+                onNavigateToEditPage = { person ->
+                    personViewModel.selectedPerson = person
+                    navController.navigate(NavRoutes.Edit.route)
+                }
             )
         }
         composable(NavRoutes.Add.route)
@@ -90,11 +93,14 @@ fun MainScreen(
         composable(NavRoutes.Edit.route)
         {
             PersonScreen(
+                person = personViewModel.selectedPerson,
                 user = authViewModel.user,
                 onSignOut = { authViewModel.signOut() },
                 onNavigateToLoginPage = {navController.navigate(NavRoutes.Home.route)},
                 onNavigateToListPage = {navController.navigate(NavRoutes.List.route)},
-                navigateBack = {navController.popBackStack()}
+                navigateBack = {navController.popBackStack()},
+                deletePerson = { id -> personViewModel.deletePerson(id) },
+                updatePerson = { id, person -> personViewModel.updatePerson(id, person) }
             )
         }
     }

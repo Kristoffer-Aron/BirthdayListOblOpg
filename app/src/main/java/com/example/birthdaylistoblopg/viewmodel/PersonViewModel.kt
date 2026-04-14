@@ -20,6 +20,8 @@ class PersonViewModel(
 
     private var originalPersonList: List<Person> = emptyList()
 
+    var selectedPerson: Person? = null
+
     fun clearPersons() {
         _personUIState.update { PersonUIState() }
     }
@@ -52,6 +54,41 @@ class PersonViewModel(
                 is NetworkResult.Success -> {
                     getPersons(person.userId)
                 }
+
+                is NetworkResult.Error -> {
+                    _personUIState.update {
+                        it.copy(isLoading = false, error = result.error)
+                    }
+                }
+            }
+        }
+    }
+
+    fun deletePerson(id: Int) {
+        _personUIState.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            when (val result = personRepository.deletePerson(id)) {
+                is NetworkResult.Success -> {
+                    getPersons(result.data.userId)
+                }
+
+                is NetworkResult.Error -> {
+                    _personUIState.update {
+                        it.copy(isLoading = false, error = result.error)
+                    }
+                }
+            }
+        }
+    }
+
+    fun updatePerson(id: Int, person: Person) {
+        _personUIState.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            when (val result = personRepository.updatePerson(id, person)) {
+                is NetworkResult.Success -> {
+                    getPersons(person.userId)
+                }
+
                 is NetworkResult.Error -> {
                     _personUIState.update {
                         it.copy(isLoading = false, error = result.error)
@@ -61,3 +98,4 @@ class PersonViewModel(
         }
     }
 }
+
