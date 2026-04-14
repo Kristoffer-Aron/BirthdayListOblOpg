@@ -95,7 +95,10 @@ fun ListScreen(
                 val people = personUIState.persons
 
                 val filteredAndSortedPeople = people
-                    .filter { it.name.contains(filter, ignoreCase = true) }
+                    .filter { 
+                        it.name.contains(filter, ignoreCase = true) || 
+                        it.age.toString().contains(filter) 
+                    }
                     .let { list ->
                         val comparator = compareBy<Person> {
                             when (sortOrder) {
@@ -121,7 +124,7 @@ fun ListScreen(
                     onValueChange = { filter = it },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                    label = { Text("Filter by name") },
+                    label = { Text("Filter by name or age") },
                     singleLine = true,
                 )
 
