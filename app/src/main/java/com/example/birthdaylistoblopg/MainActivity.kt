@@ -61,7 +61,8 @@ fun MainScreen(modifier: Modifier = Modifier) {
         {
             AddScreen(
                 onNavigateToListPage = {navController.navigate(NavRoutes.List.route)},
-                navigateBack = {navController.popBackStack()}
+                navigateBack = {navController.popBackStack()},
+                addPerson = {person -> personViewModel.addPerson(person)}
             )
         }
         composable(NavRoutes.Edit.route)

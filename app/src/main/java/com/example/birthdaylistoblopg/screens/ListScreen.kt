@@ -56,38 +56,36 @@ fun ListScreen(
 //    }
 
 
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.primary,
+                ),
+                title = { Text("My Friends") })
+        }) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(5.dp)
+        ) {
+            if (personUIState.error != null) {
+                Text(text = personUIState.error)
+            } else {
+                val people = personUIState.persons
 
-
-        Scaffold(
-            modifier = modifier.fillMaxSize(),
-            topBar = {
-                TopAppBar(
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        titleContentColor = MaterialTheme.colorScheme.primary,
-                    ),
-                    title = { Text("My Friends") })
-            }) { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(5.dp)
-            ) {
-                if (personUIState.error != null) {
-                    Text(text = personUIState.error)
-                } else {
-                    val people = personUIState.persons
-
-                    val filteredAndSortedPeople = people
-                        .filter { it.name.contains(filter, ignoreCase = true) }
-                        .sortedWith(compareBy {
-                            when (sortOrder) {
-                                SortOrder.NAME -> it.name
-                                SortOrder.AGE -> it.age
-                                SortOrder.BIRTHDAY -> it.birthday
-                            }
-                        })
+                val filteredAndSortedPeople = people
+                    .filter { it.name.contains(filter, ignoreCase = true) }
+                    .sortedWith(compareBy {
+                        when (sortOrder) {
+                            SortOrder.NAME -> it.name
+                            SortOrder.AGE -> it.age
+                            SortOrder.BIRTHDAY -> it.birthday
+                        }
+                    })
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -163,7 +161,10 @@ fun PersonCard(
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = "Name: ${person.name}", style = MaterialTheme.typography.titleMedium)
             Text(text = "Age: ${person.age}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Birthday: ${person.birthday}", style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = "Birthday: ${person.birthDayOfMonth}/${person.birthMonth}/${person.birthYear}",
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }

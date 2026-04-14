@@ -30,4 +30,24 @@ class PersonRepositoryImpl(
 
         }
     }
+
+    override suspend fun addPerson(person: Person): NetworkResult<Person> {
+        return withContext(dispatcher) {
+            try {
+                val response = personAPI.addPerson(person)
+                if (response.isSuccessful)
+                    if (response.body() != null)
+                        NetworkResult.Success(response.body()!!)
+                    else
+                        NetworkResult.Error("Response body is null")
+                else
+                    NetworkResult.Error(response.message())
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                NetworkResult.Error(e.message ?: "Unknown error")
+            }
+        }
+
+    }
 }

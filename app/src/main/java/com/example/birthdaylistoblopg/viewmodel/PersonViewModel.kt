@@ -42,4 +42,21 @@ class PersonViewModel(
             }
         }
     }
+
+    fun addPerson(person: Person) {
+        _personUIState.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            when (val result = personRepository.addPerson(person)) {
+                is NetworkResult.Success -> {
+                    getPersons()
+
+                }
+                is NetworkResult.Error -> {
+                    _personUIState.update {
+                        it.copy(isLoading = false, error = result.error)
+                    }
+                }
+            }
+        }
+    }
 }

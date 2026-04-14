@@ -11,4 +11,8 @@ import retrofit2.http.Path
 interface PersonAPI {
     @GET("Persons")
     suspend fun getPersons(): Response<List<Person>>
+
+    @POST("Persons")
+    suspend fun addPerson(@Body person: Person): Response<Person>
+
 }

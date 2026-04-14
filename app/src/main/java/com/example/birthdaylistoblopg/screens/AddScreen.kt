@@ -1,21 +1,13 @@
 package com.example.birthdaylistoblopg.screens
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -39,31 +31,29 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Popup
+import com.example.birthdaylistoblopg.data.Person
 import java.text.DateFormat
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.Calendar
+
 
 @OptIn(ExperimentalMaterial3Api::class) // TopAppBar
 @Composable
 fun AddScreen(
     modifier: Modifier = Modifier,
     onNavigateToListPage: () -> Unit,
-    navigateBack: () -> Unit
+    navigateBack: () -> Unit,
+    addPerson: (Person) -> Unit = {}
 ) {
     var name by remember { mutableStateOf("") }
     var remarks by remember { mutableStateOf("") }
     var isDatePickerDialogOpen by remember { mutableStateOf(false) }
     var selectedDate by remember { mutableStateOf<Long?>(null) }
     val dateFormatterLocal = DateFormat.getDateInstance()
+    var nameIsError by remember { mutableStateOf(false) }
+    var dateIsError by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -92,9 +82,18 @@ fun AddScreen(
             Text(text = "Add Birthday", style = MaterialTheme.typography.headlineLarge)
             OutlinedTextField(
                 value = name,
-                onValueChange = { name = it },
+                onValueChange = {
+                    name = it
+                    nameIsError = false
+                },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 label = { Text("Name") },
+                isError = nameIsError,
+                supportingText = {
+                    if (nameIsError) {
+                        Text(text = "Name is required")
+                    }
+                },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -102,8 +101,15 @@ fun AddScreen(
             OutlinedTextField(
                 //Format Long? to a String
                 value = selectedDate?.let { dateFormatterLocal.format(it) } ?: "",
-                onValueChange = { },
+                onValueChange = { dateIsError = false },
                 label = { Text("DOB") },
+                isError = dateIsError,
+                supportingText = {
+                    if (dateIsError) {
+                        Text(text = "Date of birth is required")
+                    }
+                },
+                enabled = true,
                 readOnly = true,
                 trailingIcon = {
                     IconButton(onClick = { isDatePickerDialogOpen = true }) {
@@ -114,7 +120,7 @@ fun AddScreen(
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
-                )
+            )
 
             if (isDatePickerDialogOpen) {
                 val datePickerState = rememberDatePickerState()
@@ -151,10 +157,32 @@ fun AddScreen(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(onClick = {
-                    // TODO check if the word is not empty
-                    if (!name.isEmpty()) {
-                        onNavigateToListPage()
+                    if (name.isEmpty()) {
+                        nameIsError = true
+                        return@Button
                     }
+                    if (selectedDate == null) {
+                        dateIsError = true
+                        return@Button
+                    }
+                    val calendar = Calendar.getInstance().apply {
+                        timeInMillis = selectedDate!!
+                    }
+                    val birthYear = calendar.get(Calendar.YEAR)
+                    val birthMonth = calendar.get(Calendar.MONTH) + 1
+                    val birthDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
+
+                    val person = Person(
+                        userId = "testpass@mail.dk",
+                        remarks = remarks,
+                        name = name,
+                        age = 0,
+                        birthYear = birthYear,
+                        birthMonth = birthMonth,
+                        birthDayOfMonth = birthDayOfMonth
+                    )
+                    addPerson(person)
+                    onNavigateToListPage()
                 }) {
                     Text("Add")
                 }
