@@ -31,6 +31,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.birthdaylistoblopg.PersonUIState
 import com.example.birthdaylistoblopg.data.Person
+import com.example.birthdaylistoblopg.ui.theme.BirthdayListOblOpgTheme
+import com.google.firebase.auth.FirebaseUser
 
 
 enum class SortOrder { NAME, AGE, BIRTHDAY }
@@ -38,23 +40,20 @@ enum class SortOrder { NAME, AGE, BIRTHDAY }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListScreen(
+    user: FirebaseUser?,
+    onSignOut: () -> Unit,
     personUIState: PersonUIState,
     modifier: Modifier = Modifier,
+    onNavigateToLoginPage: () -> Unit = {},
     onNavigateToAddPage: () -> Unit = {},
     onNavigateToEditPage: () -> Unit = {}
 ) {
     var filter by remember { mutableStateOf("") }
     var sortOrder by remember { mutableStateOf(SortOrder.NAME) }
 
-//    val people = remember {
-//        listOf(
-//            Person("John Doe", 25, "1999-05-15"),
-//            Person("Jane Smith", 30, "1994-11-20"),
-//            Person("Alice Johnson", 22, "2002-01-10"),
-//            Person("Bob Brown", 28, "1996-08-05")
-//        )
-//    }
-
+    if (user == null) {
+        onNavigateToLoginPage()
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -64,7 +63,15 @@ fun ListScreen(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
-                title = { Text("My Friends") })
+                title = {
+                    Text("My Friends")
+                },
+                actions = {
+                    Button(onClick = { onSignOut() }) {
+                        Text("Sign Out")
+                    }
+                }
+            )
         }) { innerPadding ->
         Column(
             modifier = Modifier
@@ -166,6 +173,17 @@ fun PersonCard(
                 style = MaterialTheme.typography.bodyMedium
             )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PersonCardPreview() {
+    BirthdayListOblOpgTheme {
+        PersonCard(
+            person = Person(1, "testpass@mail.dk", "John Doe", 1999, 1, 1, "test", 25),
+            onClick = {}
+        )
     }
 }
 

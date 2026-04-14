@@ -1,5 +1,6 @@
 package com.example.birthdaylistoblopg.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.birthdaylistoblopg.PersonUIState
@@ -19,14 +20,15 @@ class PersonViewModel(
 
     private var originalPersonList: List<Person> = emptyList()
 
-    init {
-        getPersons()
+    fun clearPersons() {
+        _personUIState.update { PersonUIState() }
     }
 
-    fun getPersons() {
+    fun getPersons(userId: String) {
+        Log.d("PersonViewModel", "getPersons called with userId: $userId")
         _personUIState.update { it.copy(isLoading = true, error = null) }
         viewModelScope.launch {
-            when (val result = personRepository.getPersons()) {
+            when (val result = personRepository.getPersons(userId)) {
                 is NetworkResult.Success -> {
                     originalPersonList = result.data
                     _personUIState.update { uiState ->
@@ -48,8 +50,7 @@ class PersonViewModel(
         viewModelScope.launch {
             when (val result = personRepository.addPerson(person)) {
                 is NetworkResult.Success -> {
-                    getPersons()
-
+                    getPersons(person.userId)
                 }
                 is NetworkResult.Error -> {
                     _personUIState.update {

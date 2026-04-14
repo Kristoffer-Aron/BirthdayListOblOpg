@@ -5,10 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -17,6 +19,7 @@ import com.example.birthdaylistoblopg.screens.ListScreen
 import com.example.birthdaylistoblopg.screens.LoginScreen
 import com.example.birthdaylistoblopg.screens.PersonScreen
 import com.example.birthdaylistoblopg.ui.theme.BirthdayListOblOpgTheme
+import com.example.birthdaylistoblopg.viewmodel.AuthViewModel
 import com.example.birthdaylistoblopg.viewmodel.PersonViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -34,7 +37,8 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun MainScreen(modifier: Modifier = Modifier) {
+fun MainScreen(
+    authViewModel: AuthViewModel = viewModel()) {
     val navController = rememberNavController()
     val personViewModel: PersonViewModel = koinViewModel()
     val personUIState: PersonUIState by personViewModel.personUIState.collectAsStateWithLifecycle()
@@ -46,13 +50,28 @@ fun MainScreen(modifier: Modifier = Modifier) {
         composable(NavRoutes.Home.route) {
             // TODO don't pass navController to Home
             LoginScreen(
+                user = authViewModel.user,
+                message = authViewModel.message,
+                signIn = { email, password -> authViewModel.signIn(email, password) },
+                register = authViewModel::register,
                 onNavigateToListPage = {navController.navigate(NavRoutes.List.route)}
             )
         }
         composable(NavRoutes.List.route)
         {
+            val user = authViewModel.user
+            LaunchedEffect(user) {
+                if (user != null) {
+                    personViewModel.getPersons(user.email ?: "")
+                } else {
+                    personViewModel.clearPersons()
+                }
+            }
             ListScreen(
+                user = user,
+                onSignOut = { authViewModel.signOut() },
                 personUIState = personUIState,
+                onNavigateToLoginPage = {navController.navigate(NavRoutes.Home.route)},
                 onNavigateToAddPage = {navController.navigate(NavRoutes.Add.route)},
                 onNavigateToEditPage = {navController.navigate(NavRoutes.Edit.route)}
             )
@@ -60,6 +79,9 @@ fun MainScreen(modifier: Modifier = Modifier) {
         composable(NavRoutes.Add.route)
         {
             AddScreen(
+                user = authViewModel.user,
+                onSignOut = { authViewModel.signOut() },
+                onNavigateToLoginPage = {navController.navigate(NavRoutes.Home.route)},
                 onNavigateToListPage = {navController.navigate(NavRoutes.List.route)},
                 navigateBack = {navController.popBackStack()},
                 addPerson = {person -> personViewModel.addPerson(person)}
@@ -68,6 +90,9 @@ fun MainScreen(modifier: Modifier = Modifier) {
         composable(NavRoutes.Edit.route)
         {
             PersonScreen(
+                user = authViewModel.user,
+                onSignOut = { authViewModel.signOut() },
+                onNavigateToLoginPage = {navController.navigate(NavRoutes.Home.route)},
                 onNavigateToListPage = {navController.navigate(NavRoutes.List.route)},
                 navigateBack = {navController.popBackStack()}
             )

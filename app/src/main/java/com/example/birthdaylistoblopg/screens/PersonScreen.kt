@@ -34,12 +34,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.google.firebase.auth.FirebaseUser
 import java.text.DateFormat
 
 @OptIn(ExperimentalMaterial3Api::class) // TopAppBar
 @Composable
 fun PersonScreen(
     modifier: Modifier = Modifier,
+    user: FirebaseUser?,
+    onSignOut: () -> Unit,
+    onNavigateToLoginPage: () -> Unit,
     onNavigateToListPage: () -> Unit,
     navigateBack: () -> Unit
 ) {
@@ -49,6 +53,10 @@ fun PersonScreen(
     var isDatePickerDialogOpen by remember { mutableStateOf(false) }
     var selectedDate by remember { mutableStateOf<Long?>(null) }
     val dateFormatterLocal = DateFormat.getDateInstance()
+
+    if (user == null) {
+        onNavigateToLoginPage()
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -66,7 +74,12 @@ fun PersonScreen(
                         )
                     }
                 },
-                title = { Text("Person") })
+                title = { Text("Person") },
+                actions = {
+                    Button(onClick = { onSignOut() }) {
+                        Text("Sign Out")
+                    }
+                })
         }) { innerPadding ->
         Column(
             modifier = modifier

@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
+    implementation(libs.androidx.compose.animation.core.lint)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -66,4 +67,5 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:3.0.0") // REST
     implementation("com.squareup.retrofit2:converter-gson:3.0.0") // JSON to obj conversion
     implementation("io.insert-koin:koin-androidx-compose:4.1.1") // dependency injection
+    implementation("androidx.compose.material:material-icons-extended:1.7.8") // cool icons for login
 }

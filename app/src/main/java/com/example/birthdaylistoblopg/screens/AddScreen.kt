@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.birthdaylistoblopg.data.Person
+import com.google.firebase.auth.FirebaseUser
 import java.text.DateFormat
 import java.util.Calendar
 
@@ -43,6 +44,9 @@ import java.util.Calendar
 @Composable
 fun AddScreen(
     modifier: Modifier = Modifier,
+    user: FirebaseUser?,
+    onSignOut: () -> Unit,
+    onNavigateToLoginPage: () -> Unit,
     onNavigateToListPage: () -> Unit,
     navigateBack: () -> Unit,
     addPerson: (Person) -> Unit = {}
@@ -54,6 +58,10 @@ fun AddScreen(
     val dateFormatterLocal = DateFormat.getDateInstance()
     var nameIsError by remember { mutableStateOf(false) }
     var dateIsError by remember { mutableStateOf(false) }
+
+    if (user == null) {
+        onNavigateToLoginPage()
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -69,6 +77,11 @@ fun AddScreen(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Go back"
                         )
+                    }
+                },
+                actions = {
+                    Button(onClick = { onSignOut() }) {
+                        Text("Sign Out")
                     }
                 },
                 title = { Text("Add Birthday") })
