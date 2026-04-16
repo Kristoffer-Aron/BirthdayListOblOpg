@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -48,9 +49,9 @@ fun ListScreen(
     onNavigateToAddPage: () -> Unit = {},
     onNavigateToEditPage: (Person) -> Unit = {}
 ) {
-    var filter by remember { mutableStateOf("") }
-    var sortOrder by remember { mutableStateOf(SortOrder.NAME) }
-    var isAscending by remember { mutableStateOf(true) }
+    var filter by rememberSaveable { mutableStateOf("") }
+    var sortOrder by rememberSaveable { mutableStateOf(SortOrder.NAME) }
+    var isAscending by rememberSaveable { mutableStateOf(true) }
 
     fun onSortClick(newOrder: SortOrder) {
         if (sortOrder == newOrder) {

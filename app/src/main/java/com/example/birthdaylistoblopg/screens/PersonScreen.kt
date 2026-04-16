@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
@@ -31,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -55,11 +58,11 @@ fun PersonScreen(
     deletePerson: (Int) -> Unit = {},
     updatePerson: (Int, Person) -> Unit = { _, _ -> }
 ) {
-    var id by remember { mutableStateOf(person?.id?.toString() ?: "") }
-    var name by remember { mutableStateOf(person?.name ?: "") }
-    var remarks by remember { mutableStateOf(person?.remarks ?: "") }
-    var isDatePickerDialogOpen by remember { mutableStateOf(false) }
-    var deleteClickCount by remember { mutableStateOf(0) }
+    var id by rememberSaveable { mutableStateOf(person?.id?.toString() ?: "") }
+    var name by rememberSaveable { mutableStateOf(person?.name ?: "") }
+    var remarks by rememberSaveable { mutableStateOf(person?.remarks ?: "") }
+    var isDatePickerDialogOpen by rememberSaveable { mutableStateOf(false) }
+    var deleteClickCount by rememberSaveable { mutableStateOf(0) }
     val context = LocalContext.current
     
     val initialDate = person?.let {
@@ -67,7 +70,7 @@ fun PersonScreen(
         cal.set(it.birthYear, it.birthMonth - 1, it.birthDayOfMonth)
         cal.timeInMillis
     }
-    var selectedDate by remember { mutableStateOf<Long?>(initialDate) }
+    var selectedDate by rememberSaveable { mutableStateOf<Long?>(initialDate) }
     val dateFormatterLocal = DateFormat.getDateInstance()
 
     if (user == null) {
@@ -100,7 +103,8 @@ fun PersonScreen(
         Column(
             modifier = modifier
                 .padding(innerPadding)
-                .padding(16.dp),
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(text = "Person Details", style = MaterialTheme.typography.headlineLarge)

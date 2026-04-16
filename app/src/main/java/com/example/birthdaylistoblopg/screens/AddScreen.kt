@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
@@ -30,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -51,13 +54,13 @@ fun AddScreen(
     navigateBack: () -> Unit,
     addPerson: (Person) -> Unit = {}
 ) {
-    var name by remember { mutableStateOf("") }
-    var remarks by remember { mutableStateOf("") }
-    var isDatePickerDialogOpen by remember { mutableStateOf(false) }
-    var selectedDate by remember { mutableStateOf<Long?>(null) }
+    var name by rememberSaveable { mutableStateOf("") }
+    var remarks by rememberSaveable { mutableStateOf("") }
+    var isDatePickerDialogOpen by rememberSaveable { mutableStateOf(false) }
+    var selectedDate by rememberSaveable { mutableStateOf<Long?>(null) }
     val dateFormatterLocal = DateFormat.getDateInstance()
-    var nameIsError by remember { mutableStateOf(false) }
-    var dateIsError by remember { mutableStateOf(false) }
+    var nameIsError by rememberSaveable { mutableStateOf(false) }
+    var dateIsError by rememberSaveable { mutableStateOf(false) }
 
     if (user == null) {
         onNavigateToLoginPage()
@@ -89,7 +92,8 @@ fun AddScreen(
         Column(
             modifier = modifier
                 .padding(innerPadding)
-                .padding(16.dp),
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(text = "Add Birthday", style = MaterialTheme.typography.headlineLarge)
